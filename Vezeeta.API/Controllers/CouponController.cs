@@ -55,19 +55,22 @@ namespace Vezeeta.API.Controllers
 
 
         [HttpPut("UpdateCoupon")]
-        public async Task<IActionResult> UpdateCoupon(int id, [FromBody] CouponDto couponDto)
+        public async Task<IActionResult> UpdateCoupon(int id, [FromForm] CouponDto couponDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { Message = ModelState });
             }
-            var result = await _UnitOfWork.Coupons.FindAsync(b => b.Id == id, new[] { "Booking" });
+            var result = await _UnitOfWork.Coupons.FindAsync(b => b.Id == id);
 
             if (result == null)
             {
                 return BadRequest(new { Message = "There is no Coupon with that id " });
             }
-            if (result.Booking != null)
+
+            var ishavebooking = _UnitOfWork.Booking.Any(b => b.CouponId == id);
+
+            if (ishavebooking)
             {
                 return BadRequest(new { Message = "This coupon is used , can't update it" });
             }
@@ -86,15 +89,16 @@ namespace Vezeeta.API.Controllers
         [HttpDelete("DeleteCoupon")] 
         public async Task<IActionResult> DeleteCoupon(int id)
         {
-            var result = await _UnitOfWork.Coupons.FindAsync(b => b.Id == id, new[] { "Booking" });
+            var result = await _UnitOfWork.Coupons.FindAsync(b => b.Id == id);
 
             if (result == null)
             {
                 return BadRequest(new { Message = "There is no Coupon with that id "});
             }
-            if (result.Booking.Count != 0)
+            var ishavebooking = _UnitOfWork.Booking.Any(b => b.CouponId == id);
+            if (ishavebooking)
             {
-                return BadRequest(result.Booking);
+                return BadRequest("This coupon is used , can't delete it");
             }
 
             _UnitOfWork.Coupons.Delete(result);

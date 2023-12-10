@@ -66,7 +66,7 @@ namespace Vezeeta.API.Controllers
 
         #region Appointment
         [HttpPost("AddAppointment")] 
-        public async Task<IActionResult> AddAppointment(int doctorId, int price,[FromForm] List<AppointmentDto> appointmentDto)
+        public async Task<IActionResult> AddAppointment(int doctorId, int price,[FromBody] List<AppointmentDto> appointmentDto)
         {
             if (!ModelState.IsValid)
             {
@@ -110,7 +110,7 @@ namespace Vezeeta.API.Controllers
 
 
         [HttpPut("update")] 
-        public async Task<IActionResult> updateAppointment(int id ,TimeSpan NewTime )
+        public async Task<IActionResult> updateAppointment(int id , TimeSpan NewTime )
         {
             var result =  await _UnitOfWork.Times.FindAsync(b => b.Id == id, new[] { "Booking" });
             if (result == null)
@@ -121,6 +121,7 @@ namespace Vezeeta.API.Controllers
             {
                 return BadRequest(new { Message = "This Appointment has booked , can't delete " });
             }
+            result.Time = NewTime;
 
             _UnitOfWork.Times.Update(result);
             _UnitOfWork.Save();

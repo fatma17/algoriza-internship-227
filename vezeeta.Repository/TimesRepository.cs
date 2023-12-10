@@ -16,14 +16,14 @@ namespace vezeeta.Repository
         protected ApplicationDbContext _context;
         public TimesRepository(ApplicationDbContext context) : base(context)
         {
-
+            _context=context;
         }
 
         public (int? timeid, int? doctorid, int? price) FindTimeWithPrice(int id) 
         {
-            var result = _context.Times.Where(time => time.Id == id).Include(T=>T.Appointment)
-                                                           .ThenInclude(A=>A.Doctor)
-                                                           .Select(T => new {
+            var result = _context.Times.Where(time => time.Id == id)
+                                                           .Select(T => new 
+                                                           {
                                                                     timeid = T.Id,
                                                                     doctorid = T.Appointment.DoctorId,
                                                                     price =T.Appointment.Doctor.Price

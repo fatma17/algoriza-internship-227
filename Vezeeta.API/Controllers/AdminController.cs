@@ -216,17 +216,15 @@ namespace Vezeeta.API.Controllers
         #endregion
 
 
-
-
         #region Patient
         [HttpGet("GetAllPatients")]
         public async Task<IActionResult> GetAllPatients([FromQuery] PaginationDto paginationDto)
         {
             if(String.IsNullOrEmpty(paginationDto.search))
             {
-                return Ok(_UnitOfWork.ApplicationUser.GetAll<PatientDto>(u => u.AccountType == "Patient", paginationDto.page, paginationDto.pagesize, PatientDto.PatientSelector));
+                return Ok(await _UnitOfWork.ApplicationUser.GetAll<PatientDto>(u => u.AccountType == "Patient", paginationDto.page, paginationDto.pagesize, PatientDto.PatientSelector));
             }
-            var result = _UnitOfWork.ApplicationUser.GetAllSearch<PatientDto> (u => u.AccountType == "Patient",paginationDto.page, paginationDto.pagesize, PatientDto.PatientSelector, PatientDto.PatientSearch( paginationDto.search));
+            var result = await _UnitOfWork.ApplicationUser.GetAllSearch<PatientDto> (u => u.AccountType == "Patient",paginationDto.page, paginationDto.pagesize, PatientDto.PatientSelector, PatientDto.PatientSearch( paginationDto.search));
             return Ok(result);
         }
 
